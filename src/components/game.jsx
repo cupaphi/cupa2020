@@ -4,8 +4,6 @@ import PostGame from './postgame'
 
 export default class Game extends React.Component{
 
-    baseURL = "https://cupa-phi.herokuapp.com"
-    // baseURL = "http://127.0.0.1:5000"
     state = {
         status: 'not_started',
         currentQuestion: -1,
@@ -16,9 +14,11 @@ export default class Game extends React.Component{
     }
 
     async componentDidMount(){
+        var baseURL = "https://cupa-phi.herokuapp.com"
+        // var baseURL = "http://127.0.0.1:5000"
         try {
             setInterval(async () => {
-                const url = this.baseURL + "/get_status"; 
+                const url = baseURL + "/get_status"; 
                 const res = await fetch(url)
                 const jsonres = await res.json()
                 console.log(jsonres)
@@ -30,7 +30,7 @@ export default class Game extends React.Component{
                 if(jsonres['status'] === 'ongoing'){
 
                     if(jsonres['current_question'] !== this.state.currentQuestion) {
-                        const url2 = this.baseURL + "/get_question"; 
+                        const url2 = baseURL + "/get_question"; 
 
                         const res2 = await fetch(url2)
 
