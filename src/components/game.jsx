@@ -1,4 +1,5 @@
 import React from 'react'
+import Question from './Question.jsx'
 export default class Game extends React.Component{
 
     constructor(props){
@@ -14,25 +15,25 @@ export default class Game extends React.Component{
         const jsonres = await res.json()
         console.log('questions sources loaded!')
         console.log(jsonres)
-        this.questionsInfo =  jsonres
+        this.questions_list = jsonres
         this.audios = {}
-        this.questionsInfo.forEach((qinfo,question_counter) => {
-								console.log(qinfo['question_id'])
-                const a = new Audio(qinfo['audio'])
-                a.setAttribute('preload','auto')
-                this.audios[question_counter] = a
+        this.questions_list.forEach((qinfo,question_counter) => {
+            console.log(qinfo['question_id'])
+            const a = new Audio(qinfo['audio'])
+            a.setAttribute('preload','auto')
+            this.audios[question_counter] = a
         })
 
         onQuestionsLoaded()
     }
 
 
-		abs = (n) => {
-			if(n<0)
-				return -n;
-			
-			return n;
-		}
+    abs = (n) => {
+        if(n<0)
+            return -n;
+        
+        return n;
+    }
 
     startNewAudio = (question_counter) => { 
       if(this.props.question_status === 'reading'){
@@ -43,6 +44,32 @@ export default class Game extends React.Component{
 					}
           audio.play()
       }
+    }
+
+    getStatus = async () => {
+        const url = this.baseURL + "/get_status"; 
+        const res = await fetch(url)
+        const jsonres = await res.json()
+        console.log(jsonres)
+
+        if(jsonres['current_question'] !== this.state.currentQuestion){
+                this.changeQuestion()
+        }
+
+        this.setState({
+                status              : jsonres['status'],
+                question_counter    : jsonres['current_question'],
+                question_status     : jsonres['question_status'],
+                reading_timer       : jsonres['reading_timer'],
+                thinking_timer      : jsonres['thinking_timer'],
+                waiting_timer       : jsonres['waiting_timer']
+        })
+    }
+
+	
+    componentDidMount(){
+        console.log("Game Component mounted")
+        this.getQuestions(() => {setInterval(this.getStatus, 500)})	
     }
 
     stopAudioIfPlaying = (quesiton_counter) => {
@@ -58,11 +85,8 @@ export default class Game extends React.Component{
       }
     }
 		
-	
-		componentDidMount(){
-			console.log("Game mounterd")
-			this.getQuestions(() => {setInterval(this.props.getStatus, 500)})	
-		}
+
+
     render(){
 
             return (
@@ -74,17 +98,15 @@ export default class Game extends React.Component{
                             <source id="audiosource" src=""></source>
                         </audio>
                     </div>
-                    <div display={this.props.question_status === 'reading'}>
-                        READING: {this.props.reading_timer}
-                    </div>
 
-                    <div display={this.props.question_status === 'thinking'}>
-                        THINKING: {this.props.thinking_timer}
-                    </div>
-
-                    <div display={this.props.question_status === 'waiting_for_answers'}>
-                        GATHERING ANSWERS: {this.props.waiting_timer}
-                    </div>
+                    <Question 
+                                question_counter = {this.props.question_counter}
+                                quesiton_id      = {this.question['question_id']}
+                                question_status  = {this.props.question_status}
+                                md               = {this.question['md']}
+                                reading_timer    = {this.props.reading_timer}
+                                thinking_timer   = {this.props.thinking_timer}
+                                waiting_timer    = {this.props.waiting_timer}/>
                 </div> 
             )
     }

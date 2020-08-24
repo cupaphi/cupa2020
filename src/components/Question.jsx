@@ -36,9 +36,16 @@ export class Question extends Component {
 
           return(
             <div>
-                  <h1>Intrebarea {this.props.questionId}</h1>
-                  <MaterialDistributiv src={this.props.question.md}/>
-                  <Timer reading_timer={this.props.reading_timer}/>
+
+                  <h1>Intrebarea {this.props.question_id}</h1>
+
+                  <MaterialDistributiv src={this.props.md}/>
+
+                  <Timer        question_status  = {this.props.question_status}
+                                reading_timer    = {this.props.reading_timer}
+                                thinking_timer   = {this.props.thinking_timer}
+                                waiting_timer    = {this.props.waiting_timer}/>
+
                   <AnswerForm submitAnswers = {this.props.onSubmit}/>
             </div>
         )
